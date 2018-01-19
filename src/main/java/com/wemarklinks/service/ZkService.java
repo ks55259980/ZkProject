@@ -1,5 +1,9 @@
 package com.wemarklinks.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,9 +80,36 @@ public class ZkService {
         return user;
     }
     
-    public List<Map<String,Object>> SSR_GetAllUserInfo(){
+    public Map<String,Object> SSR_GetAllUserInfo(Integer page,Integer pageSize){
         List<Map<String,Object>> list = sdk.SSR_GetAllUserInfo(ZkemSDK.machineNumber);
-        return list;
+        Collections.sort(list,new Comparator<Map<String,Object>>(){
+            @Override
+            public int compare(Map<String,Object> m1, Map<String,Object> m2) {
+                // TODO Auto-generated method stub
+                return    (int)m1.get("userId") - (int)m2.get("userId"); 
+            }}
+        );
+//        System.out.println(list);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("notes", list.size());
+        map.put("pageSize", pageSize);
+        double totalPage = Math.ceil((list.size()*1.0)/pageSize);
+        map.put("totalPage", Math.ceil((list.size()+0.0)/pageSize));
+        if(page>totalPage){
+            page = (int)totalPage;
+        }
+        map.put("page", page);
+        int start = (page-1)*pageSize;
+        int end = page * pageSize -1;
+        List<Map<String,Object>> list2 = new ArrayList<Map<String,Object>>();
+        for(int i=0;i<list.size();i++){
+            if(i<start || i >end){
+                continue ;
+            }
+            list2.add(list.get(i));
+        }
+        map.put("list", list2);
+        return map;
     }
     
     /**
