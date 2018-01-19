@@ -75,10 +75,10 @@ public class ZKTest {
     
     @Test
     public void SetUserInfoExTest(){
-        boolean infoEx = sdk.SetUserInfoEx(1,1, 128);
+        boolean infoEx = sdk.SetUserInfoEx(1,2, 131);
         log.info("设置验证方式:{}",infoEx);
-        Integer ex = sdk.GetUserInfoEx(1, 1);
-        log.info("获取用户 {} 的验证方式 :{}",1,ex);
+        Integer ex = sdk.GetUserInfoEx(1, 2);
+        log.info("获取用户 {} 的验证方式 :{}",2,ex);
     }
     
     @Test
@@ -133,6 +133,12 @@ public class ZKTest {
         log.info("读取用户: {}",ssr_GetUserInfo);
     }
     
+    @Test
+    public void setUserInfo(){
+        boolean userInfo = sdk.SSR_SetUserInfo(1, "3", "小指", "", 0, false);
+        log.info("设置用户 :{}",userInfo);
+    }
+    
 //    @Test
 //    public void SetUserInfoExTest(){
 //        boolean setUserInfoEx = sdk.SetUserInfoEx(1, 2, 130);
@@ -149,5 +155,17 @@ public class ZKTest {
     public void ACUnlockTest(){
         boolean acUnlock = sdk.ACUnlock(1, 1);
         log.info("开门:{}",acUnlock);
+    }
+    
+//    @Test
+//    public void enableDeviceTest(){
+//        boolean b = sdk.EnableDevice(1, 1);
+//        log.info("测试机器是否可用:{}",b);
+//    }
+    
+    @Test
+    public void IsTFTMachineTest(){
+        boolean b = sdk.isTFTMachine(1);
+        log.info("IsTFTMachine : {}",b);
     }
 }

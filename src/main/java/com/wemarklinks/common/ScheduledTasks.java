@@ -1,8 +1,9 @@
 package com.wemarklinks.common;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +15,21 @@ public class ScheduledTasks {
     
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
     
-//    @Autowired
     private ZkemSDK sdk = new ZkemSDK();
-    @Autowired
-    private ZKConfig config;
+    private ZKConfig config = new ZKConfig();
     
-    @Scheduled(cron = "0 1 * * * ?")
+    public ScheduledTasks() {
+        boolean b = sdk.Connect_Net(config.getIp()[0], config.getPort());
+        log.info("ScheduledTasks 连接设备 : {}", b);
+    }
+    
+    @Scheduled(cron = "0 0/8 * * * ?")
     public void cheakSDK() {
-        for (int i = 0; i < config.getIp().length; i++) {
-            boolean b = sdk.EnableDevice(i, 1);
-            log.info("device enable : {} ", b);
+        boolean b = sdk.isTFTMachine(1);
+        log.info("心跳检测 :{}", b);
+        if(b == false){
+            throw new RuntimeException("连接设备失败");
         }
-        
     }
     
 }

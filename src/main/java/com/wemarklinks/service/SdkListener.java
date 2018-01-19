@@ -5,7 +5,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -26,8 +25,8 @@ import com.wemarklinks.method.ZkemSDK;
 public class SdkListener implements CommandLineRunner {
     
     private static final Logger log = LoggerFactory.getLogger(SdkListener.class);
-    @Autowired
-    ZKConfig config;
+    
+    ZKConfig config = new ZKConfig();
     
     ZkemSDK sdk = new ZkemSDK();
     
@@ -43,7 +42,7 @@ public class SdkListener implements CommandLineRunner {
             if (i == 0) {
                 listen(i, event1,t1);
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(15000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -86,6 +85,7 @@ public class SdkListener implements CommandLineRunner {
                 return;
             }
             new DispatchEvents(sdk.zkem, event);
+            log.info("注册事件");
             Dispatch.call(sdk.zkem, "RegEvent", new Variant(1L), new Variant(65535L));
             sta.doMessagePump();
             log.info("domessage");
@@ -115,6 +115,7 @@ public class SdkListener implements CommandLineRunner {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor(){
             @Override
             public void shutdown() {
+                sdk.Disconnect();
                 super.shutdown();
                 stopThread(sta1,t1);
                 stopThread(sta2,t2);

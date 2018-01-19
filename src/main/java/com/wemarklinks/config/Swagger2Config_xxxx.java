@@ -23,7 +23,7 @@ public class Swagger2Config_xxxx {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("activity文档").version("v1").build();
+		return new ApiInfoBuilder().title("zksdk文档").version("v1").build();
 	}
 	
 }

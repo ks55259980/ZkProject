@@ -19,12 +19,19 @@ public class ZkemSDK {
     private static final Logger log = LoggerFactory.getLogger(ZkemSDK.class);
 
 	//初始化中控插件
-	public static String componetName="zkemkeeper.ZKEM.1";
-	public static ActiveXComponent zkem = new ActiveXComponent("zkemkeeper.ZKEM.1");
+	public static String componetName="zkemkeeper.ZKEM";
+	public static ActiveXComponent zkem = new ActiveXComponent("zkemkeeper.ZKEM");
+	public static final int machineNumber = 1;
+	
+	/**  设置考勤机验证方式 , 有多种方式 ,这里选五种  */
+	public static final int FP = 129;      //指纹
+	public static final int PIN = 130;    //工号
+	public static final int PW = 131;    //密码
+	public static final int RF = 132;      //卡
+	public static final int FACE = 143;  //人脸
 	
 	
 	/****************************5.1连接机器相关函数*********************************/
-	
 	
 	/**
 	 * 通过IP地址连接机器，和机器建立一个网络连接
@@ -489,7 +496,10 @@ public class ZkemSDK {
 	 * 上传用户验证方式或组验证方式，只有多种验证方式的机器可支持该函数
 	 * 函数原型:VARIANT_BOOL SetUserInfoEx([in]LONG dwMachineNumber,[in]LONG dwEnrollNumber,
 	 * [in]LONG VerifyStyle,[in] BYTE* Reserved)
-	 * 
+	 * 彩屏门禁指纹机的值为 :128(FP/PW/RF/FACE), 129(FP), 130(PIN), 131(PW), 132(RF), 133(FP/PW),
+     * 134(FP/RF), 135(PW/RF), 136(PIN&FP), 137(FP&PW), 138(FP&RF), 139(PW&RF), 140(FP&PW&RF), 141(PIN&FP&PW),
+     * 142(FP&RF/PIN),143(FACE),144(FACE&FP),145(FACE&PW),146(FACE&RF),147(FACE&FP&RF),148(F ACE&FP&PW).
+
 	 * dwMachineNumber:机器号
 	 * dwEnrollNumber:用户号
 	 * VerifyStyle:验证方式
@@ -589,40 +599,22 @@ public class ZkemSDK {
 					enable).getBoolean();
 			
 			//如果没有用户编号则跳过
-			String strEnrollnumber=enrollNumber.getStringRef();
-			if(strEnrollnumber==null || strEnrollnumber.trim().length()==0)
-				continue;
+//			String strEnrollnumber=enrollNumber.getStringRef();
+//			if(strEnrollnumber==null || strEnrollnumber.trim().length()==0)
+//				continue;
 			
-			//名字乱码处理
-			String strName=null;
-			
-			if(name.getStringRef().getBytes().length == 9 || name.getStringRef().getBytes().length == 8)
-			{
-				strName = name.getStringRef().substring(0,3);
-			}else if(name.getStringRef().getBytes().length == 7 || name.getStringRef().getBytes().length == 6)
-			{
-				strName = name.getStringRef().substring(0,2);
-			}else if(name.getStringRef().getBytes().length == 11 || name.getStringRef().getBytes().length == 10)
-			{
-				strName = name.getStringRef().substring(0,4);
-			}
-			
-//			
 //			//如果没有名字则跳过
 //			if(strName==null || strName.trim().length()==0)
 //				continue;
 			
 			Map<String,Object> userMap=new HashMap<String,Object>();
-			userMap.put("machinenumber", machineNumber.getIntRef());
-			userMap.put("enrollnumber", enrollNumber.getStringRef());
-			userMap.put("name", strName);
+			userMap.put("userId", enrollNumber.getStringRef());
+			userMap.put("name", cutString(name));
 			userMap.put("password", password.getStringRef());
 			userMap.put("privilege", privilege.getIntRef());
 			userMap.put("enable", enable.getBooleanRef());
-			
 			listUser.add(userMap);
 		}
-		
 		return listUser;
 	}
 	
@@ -659,14 +651,27 @@ public class ZkemSDK {
 		}
 		
 		Map<String,Object> mapUser=new HashMap<String,Object>();
-		mapUser.put("name", name.getStringRef());
+		mapUser.put("name", cutString(name));
 		mapUser.put("password", password.getStringRef());
 		mapUser.put("privilege", privilege.getIntRef());
 		mapUser.put("enable", enable.getBooleanRef());
-		
+		mapUser.put("userId", enrollNumber);
 		return mapUser;
 	}
 	
+	private String cutString(Variant name){
+        String nameStr = name.getStringRef();
+        char[] n = nameStr.toCharArray();
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0 ; i < n.length ; i++){
+            if(n[i] == 0){
+                break;
+            }
+            sb.append(n[i]);
+        }
+        nameStr = sb.toString();
+        return nameStr;
+	}
 	
 	/**
 	 * 设置指定用户的用户信息，若机内没有该用户，则会创建该用户
@@ -1830,6 +1835,7 @@ public class ZkemSDK {
 	 * @param flag 1为启用，0为禁用
 	 * @return 设置成功返回true，设置失败返回false
 	 */
+	@Deprecated //未连接机器也会返回true
 	public boolean EnableDevice(int machineNumber,int flag){
 		return zkem.invoke("EnableDevice",new Variant(machineNumber),new Variant(flag)).getBoolean();
 	}

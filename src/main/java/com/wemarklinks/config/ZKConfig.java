@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ZKConfig {
     {
         Properties prop = new Properties(); 
-        InputStream in = Object.class.getResourceAsStream("/zksdk.properties"); 
+        InputStream in = ZKConfig.class.getResourceAsStream("/zksdk.properties"); 
         try { 
             prop.load(in); 
             ip = prop.getProperty("ip").trim().split(","); 
@@ -20,7 +17,6 @@ public class ZKConfig {
             e.printStackTrace(); 
         } 
     }
-    
     private String[] ip;
     private String[] machineNumber;
     private int port;
