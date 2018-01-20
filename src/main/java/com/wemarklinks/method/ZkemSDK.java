@@ -599,16 +599,17 @@ public class ZkemSDK {
 					enable).getBoolean();
 			
 			//如果没有用户编号则跳过
-//			String strEnrollnumber=enrollNumber.getStringRef();
-//			if(strEnrollnumber==null || strEnrollnumber.trim().length()==0)
-//				continue;
+			String strEnrollnumber=enrollNumber.getStringRef();
+			System.out.println(strEnrollnumber);
+			if(strEnrollnumber==null || strEnrollnumber.trim().length()==0)
+				continue;
 			
 //			//如果没有名字则跳过
 //			if(strName==null || strName.trim().length()==0)
 //				continue;
 			
 			Map<String,Object> userMap=new HashMap<String,Object>();
-			userMap.put("userId", enrollNumber.getStringRef());
+			userMap.put("userId", Integer.valueOf(strEnrollnumber));
 			userMap.put("name", cutString(name));
 			userMap.put("password", password.getStringRef());
 			userMap.put("privilege", privilege.getIntRef());

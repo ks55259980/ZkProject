@@ -135,6 +135,8 @@ public class ZKController {
         map.put("page", page);
         map.put("pageSize", pageSize);
         map.put("totalPage", 8);
+        map = service.SSR_GetAllUserInfo(page, pageSize);
+        
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", map);
     }
     
