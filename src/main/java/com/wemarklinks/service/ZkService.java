@@ -88,15 +88,15 @@ public class ZkService {
                 return    (int)m1.get("userId") - (int)m2.get("userId"); 
             }}
         );
-        System.out.println(list);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("notes", list.size());
         map.put("pageSize", pageSize);
         double totalPage = Math.ceil((list.size()*1.0)/pageSize);
-        map.put("totalPage", Math.ceil((list.size()+0.0)/pageSize));
+        map.put("totalPage", totalPage);
         if(page>totalPage){
             page = (int)totalPage;
         }
+        map.put("page", page);
         int start = (page-1)*pageSize;
         int end = page * pageSize -1;
         List<Map<String,Object>> list2 = new ArrayList<Map<String,Object>>();
