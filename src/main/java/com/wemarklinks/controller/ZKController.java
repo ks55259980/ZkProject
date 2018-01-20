@@ -108,6 +108,7 @@ public class ZKController {
         user.setPassword(password);
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
+//        return JsonResult.RetJsone(ResultCode.SUCCESS , "",  );
         Map map = service.SSR_GetUserInfo(userId);
         if(map == null){
             return JsonResult.RetJsone(ResultCode.SYS_ERROR , "查询用户失败", "");
@@ -127,7 +128,7 @@ public class ZKController {
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
         List<User> list = new ArrayList<User>();
-        for(int i=0;i<10;i++){
+        for(int i=0;i<pageSize;i++){
             list.add(user);
         }
         Map<String, Object> map = new HashMap<String, Object>();
@@ -135,6 +136,7 @@ public class ZKController {
         map.put("page", page);
         map.put("pageSize", pageSize);
         map.put("totalPage", 8);
+        map.put("notes", pageSize * 8 -1);
         map = service.SSR_GetAllUserInfo(page, pageSize);
         
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", map);
@@ -158,7 +160,10 @@ public class ZKController {
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
     }
     
-    
-    
+    @ApiOperation(value = "删除用户", notes = "删除用户")
+    @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
+    public Map<String, Object> deleteUser(String userId){
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
+    }
     
 }
