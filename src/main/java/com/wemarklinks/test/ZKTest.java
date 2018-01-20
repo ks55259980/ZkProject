@@ -46,11 +46,11 @@ public class ZKTest {
         log.info("获取用户脸部模板:{}",faceStr);
     }
     
-    @Test
-    public void SSR_DeleteEnrollDataExtTest(){
-        boolean deleteEnrollData = sdk.SSR_DeleteEnrollDataExt(1, "4", 8);  //可用
-        log.info("删除指纹数据:{}",deleteEnrollData);
-    }
+//    @Test
+//    public void SSR_DeleteEnrollDataExtTest(){
+//        boolean deleteEnrollData = sdk.SSR_DeleteEnrollDataExt(1, "4", 8);  //可用
+//        log.info("删除指纹数据:{}",deleteEnrollData);
+//    }
     
     @Test 
     public void GetUserTmpExStrTest(){
@@ -75,7 +75,7 @@ public class ZKTest {
     
     @Test
     public void SetUserInfoExTest(){
-        boolean infoEx = sdk.SetUserInfoEx(1,2, 131);
+        boolean infoEx = sdk.SetUserInfoEx(1,2, 128);
         log.info("设置验证方式:{}",infoEx);
         Integer ex = sdk.GetUserInfoEx(1, 2);
         log.info("获取用户 {} 的验证方式 :{}",2,ex);
@@ -83,10 +83,25 @@ public class ZKTest {
     
     @Test
     public void GetUserInfoExTest(){
-        Integer ex = sdk.GetUserInfoEx(1, 3);
+        Integer ex = sdk.GetUserInfoEx(1, 2);
         log.info("验证方式:{}",ex);
-        
     }
+    
+    @Test
+    public void SSR_DeleteEnrollDataExtTest(){
+//        boolean ext = sdk.SSR_DeleteEnrollDataExt(1, "2", ZkemSDK.DEL_PW);
+//        log.info("删除密码 : {}",ext);
+//        boolean ext = sdk.SSR_DeleteEnrollDataExt(1, "7",ZkemSDK.DEL_FP);
+//        log.info("删除指纹 : {}",ext);
+        boolean ext = sdk.SSR_DeleteEnrollDataExt(1, "5", ZkemSDK.DEL_ALL);
+        log.info("删除所有 : {}",ext);
+    }
+    
+//    @Test
+//    public void DeleteUserInfoExTest(){
+//        boolean ex = sdk.DeleteUserInfoEx(1, 2);
+//        log.info("删除用户的多种验证方式 : {}",ex);
+//    }
     
     @After
     public void after(){

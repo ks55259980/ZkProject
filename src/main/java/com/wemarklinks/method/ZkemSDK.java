@@ -30,6 +30,10 @@ public class ZkemSDK {
 	public static final int RF = 132;      //卡
 	public static final int FACE = 143;  //人脸
 	
+	/** 删除指定信息常量  */
+//     public static final int DEL_PW = 10;   //删除密码
+	 public static final int DEL_FP = 13;    //删除指纹
+	 public static final int DEL_ALL = 12;   //删除全部
 	
 	/****************************5.1连接机器相关函数*********************************/
 	
@@ -551,6 +555,7 @@ public class ZkemSDK {
 	 * @param enrollNumber 用户号
 	 * @return 删除用户验证成功返回true，删除用户验证失败返回false
 	 */
+	@Deprecated
 	public boolean DeleteUserInfoEx(int machineNumber,int enrollNumber){
 		return zkem.invoke("DeleteUserInfoEx",new Variant(machineNumber),new Variant(enrollNumber)).getBoolean();
 	}
@@ -600,7 +605,7 @@ public class ZkemSDK {
 			
 			//如果没有用户编号则跳过
 			String strEnrollnumber=enrollNumber.getStringRef();
-			System.out.println(strEnrollnumber);
+//			System.out.println(strEnrollnumber);
 			if(strEnrollnumber==null || strEnrollnumber.trim().length()==0)
 				continue;
 			

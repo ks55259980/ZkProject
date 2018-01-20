@@ -53,7 +53,7 @@ public class ZKController {
         user.setPassword(password);
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
-        boolean b = service.changeUserInfo(userId, name, privilege);
+        boolean b = service.changeUserInfo(userId, name, privilege,password);
         log.info("创建用户 : {}",b);
         if(b == false){
             return JsonResult.RetJsone(ResultCode.UNKNOWN_ERROR, "创建用户失败", "");
@@ -77,7 +77,7 @@ public class ZKController {
         user.setPassword(password);
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
-        boolean b = service.changeUserInfo(userId, name, privilege);
+        boolean b = service.changeUserInfo(userId, name, privilege,password);
         log.info("更新用户 : {}",b);
         if(b == false){
             return JsonResult.RetJsone(ResultCode.UNKNOWN_ERROR, "创建用户失败", "");
@@ -102,12 +102,12 @@ public class ZKController {
     @ApiOperation(value = "获取用户", notes = "")
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     public Map<String, Object> getUserInfo(@RequestParam String userId){
-        User user = new User();
-        user.setUserId(userId);
-        user.setName(name);
-        user.setPassword(password);
-        user.setPrivilege(privilege);
-        user.setEnabled(enabled);
+//        User user = new User();
+//        user.setUserId(userId);
+//        user.setName(name);
+//        user.setPassword(password);
+//        user.setPrivilege(privilege);
+//        user.setEnabled(enabled);
 //        return JsonResult.RetJsone(ResultCode.SUCCESS , "",  );
         Map map = service.SSR_GetUserInfo(userId);
         if(map == null){
@@ -121,48 +121,63 @@ public class ZKController {
     public Map<String, Object> listUser(
             @ApiParam(value = "查询页", required = true) @RequestParam Integer page,
             @ApiParam(value = "数据数目", required = true) @RequestParam Integer pageSize){
-        User user = new User();
-        user.setUserId(userId);
-        user.setName(name);
-        user.setPassword(password);
-        user.setPrivilege(privilege);
-        user.setEnabled(enabled);
-        List<User> list = new ArrayList<User>();
-        for(int i=0;i<pageSize;i++){
-            list.add(user);
-        }
+//        User user = new User();
+//        user.setUserId(userId);
+//        user.setName(name);
+//        user.setPassword(password);
+//        user.setPrivilege(privilege);
+//        user.setEnabled(enabled);
+//        List<User> list = new ArrayList<User>();
+//        for(int i=0;i<pageSize;i++){
+//            list.add(user);
+//        }
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("list", list);
-        map.put("page", page);
-        map.put("pageSize", pageSize);
-        map.put("totalPage", 8);
-        map.put("notes", pageSize * 8 -1);
+//        map.put("list", list);
+//        map.put("page", page);
+//        map.put("pageSize", pageSize);
+//        map.put("totalPage", 8);
+//        map.put("notes", pageSize * 8 -1);
         map = service.SSR_GetAllUserInfo(page, pageSize);
-        
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", map);
     }
     
     @ApiOperation(value = "远程开门", notes = "")
     @RequestMapping(value = "/openDoor", method = RequestMethod.PUT)
     public Map<String, Object> openDoor(){
-        return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
+        boolean openDoor = service.openDoor(ZkemSDK.machineNumber);
+        if(openDoor == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "开门失败", "");
+        }
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "开门成功", "");
     }
     
     @ApiOperation(value = "激活用户", notes = "激活后 , 该用户可以扫脸并打开门禁")
     @RequestMapping(value = "/enableUser", method = RequestMethod.PUT)
     public Map<String, Object> enableUser(String userId){
+        boolean ex = service.setUserInfoEx(userId, ZkemSDK.FACE);
+        if(ex == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "激活用户失败", "");
+        }
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
     }
     
     @ApiOperation(value = "禁用用户", notes = "禁用后 , 该用户无法打开门禁")
     @RequestMapping(value = "/disableUser", method = RequestMethod.PUT)
     public Map<String, Object> disableUser(String userId){
+        boolean ex = service.setUserInfoEx(userId, ZkemSDK.PW);
+        if(ex == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+        }
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
     }
     
     @ApiOperation(value = "删除用户", notes = "删除用户")
     @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
     public Map<String, Object> deleteUser(String userId){
+        boolean ex = service.deleteUser(userId);
+        if(ex == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "删除用户失败", "");
+        }
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
     }
     

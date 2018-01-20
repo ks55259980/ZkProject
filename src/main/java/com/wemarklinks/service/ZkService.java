@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.wemarklinks.config.ZKConfig;
 import com.wemarklinks.method.ZkemSDK;
@@ -49,8 +50,9 @@ public class ZkService {
      *            用户权限, 3为管理员，0为普通用户
      * @return
      */
-    public boolean changeUserInfo(String userId, String name, int privilege) {
-        boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, userId, name, "", privilege, true);
+    public boolean changeUserInfo(String userId, String name, int privilege, String password) {
+        password = StringUtils.isEmpty(password) ? "" : password;
+        boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, userId, name, password, privilege, true);
         if (b == false) {
             return false;
         }
@@ -66,7 +68,7 @@ public class ZkService {
     public boolean changeUseres(User[] users) {
         for (int j = 0; j < users.length; j++) {
             User user = users[j];
-            boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, user.getUserId(), user.getName(), "", user.getPrivilege(), true);
+            boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, user.getUserId(), user.getName(),user.getPassword(), user.getPrivilege(), true);
             if (b == false) {
                 return false;
             }
@@ -167,6 +169,11 @@ public class ZkService {
     public boolean setUserInfoEx(String userId, int verifyStyle){
         boolean b = sdk.SetUserInfoEx(ZkemSDK.machineNumber, (int)Integer.valueOf(userId), verifyStyle);
         return b;
+    }
+    
+    public boolean deleteUser(String userId){
+        boolean ext = sdk.SSR_DeleteEnrollDataExt(ZkemSDK.machineNumber, userId, ZkemSDK.DEL_ALL);
+        return ext;
     }
     
     /**
