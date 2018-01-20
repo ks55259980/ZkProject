@@ -50,9 +50,9 @@ public class ZkService {
      *            用户权限, 3为管理员，0为普通用户
      * @return
      */
-    public boolean changeUserInfo(String userId, String name, int privilege, String password) {
+    public boolean changeUserInfo(String userId, String name, int privilege, String password,boolean enanbled) {
         password = StringUtils.isEmpty(password) ? "" : password;
-        boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, userId, name, password, privilege, true);
+        boolean b = sdk.SSR_SetUserInfo(ZkemSDK.machineNumber, userId, name, password, privilege, enanbled);
         if (b == false) {
             return false;
         }
@@ -77,7 +77,7 @@ public class ZkService {
     }
     
     /** 根据userId查找user */
-    public Map SSR_GetUserInfo(String userId){
+    public Map<String,Object> SSR_GetUserInfo(String userId){
         Map<String, Object> user = sdk.SSR_GetUserInfo(ZkemSDK.machineNumber, userId);
         return user;
     }

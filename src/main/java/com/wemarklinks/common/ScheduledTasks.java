@@ -23,8 +23,12 @@ public class ScheduledTasks {
     
     @Scheduled(cron = "0 0/8 * * * ?")
     public void cheakSDK() {
-        boolean b = sdk.isTFTMachine(1);
-        log.info("心跳检测 :{}", b);
+        boolean b = sdk.ReadRTLog(1);
+        log.info("读取实时事件 : {}",b);
+        boolean b1 = sdk.GetRTLog(1);
+        log.info("取出实时事件 :{}",b1);
+//        boolean b = sdk.isTFTMachine(1);
+//        log.info("心跳检测 :{}", b);
         if(b == false){
             throw new RuntimeException("连接设备失败");
         }

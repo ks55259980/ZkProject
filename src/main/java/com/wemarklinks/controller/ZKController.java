@@ -53,7 +53,7 @@ public class ZKController {
         user.setPassword(password);
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
-        boolean b = service.changeUserInfo(userId, name, privilege,password);
+        boolean b = service.changeUserInfo(userId, name, privilege,password,enabled);
         log.info("创建用户 : {}",b);
         if(b == false){
             return JsonResult.RetJsone(ResultCode.UNKNOWN_ERROR, "创建用户失败", "");
@@ -77,7 +77,7 @@ public class ZKController {
         user.setPassword(password);
         user.setPrivilege(privilege);
         user.setEnabled(enabled);
-        boolean b = service.changeUserInfo(userId, name, privilege,password);
+        boolean b = service.changeUserInfo(userId, name, privilege,password,enabled);
         log.info("更新用户 : {}",b);
         if(b == false){
             return JsonResult.RetJsone(ResultCode.UNKNOWN_ERROR, "创建用户失败", "");
@@ -154,21 +154,49 @@ public class ZKController {
     @ApiOperation(value = "激活用户", notes = "激活后 , 该用户可以扫脸并打开门禁")
     @RequestMapping(value = "/enableUser", method = RequestMethod.PUT)
     public Map<String, Object> enableUser(String userId){
+        Map<String,Object> info = service.SSR_GetUserInfo(userId);
+        if(info == null){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+        }
+        info.put("enabled", true);
+        boolean b = service.changeUserInfo(
+                (String)info.get("userId"), 
+                (String)info.get("name"), 
+                (int)(Integer)info.get("privilege"), 
+                (String)info.get("password"),
+                true);
+        if(b == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+        }
         boolean ex = service.setUserInfoEx(userId, ZkemSDK.FACE);
         if(ex == false){
             return JsonResult.RetJsone(ResultCode.SYS_ERROR , "激活用户失败", "");
         }
-        return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", info);
     }
     
     @ApiOperation(value = "禁用用户", notes = "禁用后 , 该用户无法打开门禁")
     @RequestMapping(value = "/disableUser", method = RequestMethod.PUT)
     public Map<String, Object> disableUser(String userId){
+        Map<String,Object> info = service.SSR_GetUserInfo(userId);
+        if(info == null){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+        }
+        info.put("enabled", false);
+        boolean b = service.changeUserInfo(
+                (String)info.get("userId"), 
+                (String)info.get("name"), 
+                (int)(Integer)info.get("privilege"), 
+                (String)info.get("password"),
+                false);
+        if(b == false){
+            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+        }
         boolean ex = service.setUserInfoEx(userId, ZkemSDK.PW);
         if(ex == false){
             return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
         }
-        return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", info);
     }
     
     @ApiOperation(value = "删除用户", notes = "删除用户")

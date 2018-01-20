@@ -183,4 +183,12 @@ public class ZKTest {
         boolean b = sdk.isTFTMachine(1);
         log.info("IsTFTMachine : {}",b);
     }
+    
+    @Test
+    public void ReadRTLog(){
+        boolean b = sdk.ReadRTLog(1);
+        log.info("读取实时事件 : {}",b);
+        boolean b1 = sdk.GetRTLog(1);
+        log.info("取出实时事件 :{}",b1);
+    }
 }

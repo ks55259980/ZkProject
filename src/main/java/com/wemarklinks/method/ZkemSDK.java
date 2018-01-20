@@ -2117,5 +2117,21 @@ public class ZkemSDK {
 	    boolean boolean1 = zkem.invoke("ACUnlock",new Variant(machineNumber),new Variant(delay)).getBoolean();
 	    return boolean1;
 	}
+	
+	/**
+	 * 读取实时事件到pc缓冲区
+	 * @param machineNumber
+	 * @return
+	 */
+	public boolean ReadRTLog(int machineNumber){
+	    boolean b = zkem.invoke("ReadRTLog",new Variant(machineNumber)).getBoolean();
+	    return b;
+	}
+	
+	public boolean GetRTLog(int machineNumber){
+	    boolean b = zkem.invoke("GetRTLog",new Variant(machineNumber)).getBoolean();
+	    return b;
+	}
+	
 }
 
