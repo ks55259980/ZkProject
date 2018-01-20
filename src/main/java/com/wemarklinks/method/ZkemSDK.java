@@ -613,7 +613,7 @@ public class ZkemSDK {
 			userMap.put("name", cutString(name));
 			userMap.put("password", password.getStringRef());
 			userMap.put("privilege", privilege.getIntRef());
-			userMap.put("enable", enable.getBooleanRef());
+			userMap.put("enabled", enable.getBooleanRef());
 			listUser.add(userMap);
 		}
 		return listUser;
