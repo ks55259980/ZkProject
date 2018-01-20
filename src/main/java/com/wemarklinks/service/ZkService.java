@@ -85,7 +85,6 @@ public class ZkService {
         Collections.sort(list,new Comparator<Map<String,Object>>(){
             @Override
             public int compare(Map<String,Object> m1, Map<String,Object> m2) {
-                // TODO Auto-generated method stub
                 return    (int)m1.get("userId") - (int)m2.get("userId"); 
             }}
         );
