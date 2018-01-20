@@ -25,13 +25,34 @@ public class ZkemEvent1 extends ZkemEvent {
      */
     public void OnAttTransactionEx(Variant[] vars) {
         System.out.println("Event : OnAttTransactionEx111--->" + Thread.currentThread().getName());
+        for(Variant var : vars){
+            System.out.println(var);
+        }
         String userId = vars[0].toString();
+        int isInValid = vars[1].getInt();
+        int attState = vars[2].getInt();
+        int verifyMethod = vars[3].getInt();
+        String year = vars[4].toString();
+//        String month = check(vars[5].toString());
+//        String day = check(vars[6].toString());
+//        String hour = check(vars[7].toString());
+//        String minute = check(vars[8].toString());
+        String month = vars[5].toString();
+        String day = vars[6].toString();
+        String hour = vars[7].toString();
+        String minute = vars[8].toString();
+//        String seconde = check(vars[9].toString());
         if (!super.checkLong(userId)) {
             return;
         }
-        System.out.println(userId);
-        /**
-         * TODO: 进门时 : 
-         */
+        String time = String.format("%s-%s-%s %s:%s", year, month, day,hour,minute);
+        System.out.println(time);
+        
+        
     }
+    
+    private String check(String in){
+        return in.length() == 1 ? "0" + in : in; 
+    }
+    
 }
