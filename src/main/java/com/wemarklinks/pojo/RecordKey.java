@@ -2,10 +2,11 @@ package com.wemarklinks.pojo;
 
 import java.util.Date;
 
-public class Record extends RecordKey {
-    private String name;
+public class RecordKey {
     private String userid;
+
     private String status;
+
     private Date time;
 
     public String getUserid() {
@@ -30,12 +31,5 @@ public class Record extends RecordKey {
 
     public void setTime(Date time) {
         this.time = time;
-    }
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

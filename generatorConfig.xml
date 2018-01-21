@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+<classPathEntry  location="C:\Users\dell\.m2\repository\mysql\mysql-connector-java\5.1.43\mysql-connector-java-5.1.43.jar" />
+  <context id="Mysql">
+   <commentGenerator >  
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true" />
+    </commentGenerator>
+    <jdbcConnection connectionURL="jdbc:mysql://localhost:3306/zk_project?characterEncoding=utf8&amp;useSSL=false" driverClass="com.mysql.jdbc.Driver" password="root" userId="root" />
+    <javaModelGenerator targetPackage="com.wemarklinks.pojo" targetProject="ZkemProject/src/main/java">
+    </javaModelGenerator>
+    <sqlMapGenerator targetPackage="com.wemarklinks.mapperxml" targetProject="ZkemProject/src/main/java" >
+    </sqlMapGenerator>
+    <javaClientGenerator targetPackage="com.wemarklinks.mapper" targetProject="ZkemProject/src/main/java" type="XMLMAPPER" >
+    </javaClientGenerator>
+    <table tableName="record" domainObjectName="Record" ></table>
+        
+  </context>
+</generatorConfiguration>

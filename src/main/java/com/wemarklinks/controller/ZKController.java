@@ -1,6 +1,7 @@
 package com.wemarklinks.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wemarklinks.common.ResultCode;
+import com.wemarklinks.mapper.RecordMapperExt;
 import com.wemarklinks.method.ZkemSDK;
+import com.wemarklinks.pojo.Record;
 import com.wemarklinks.service.User;
 import com.wemarklinks.service.ZkService;
 import com.wemarklinks.util.JsonResult;
@@ -32,6 +35,8 @@ public class ZKController {
     @Autowired
     ZkService service;
     ZkemSDK sdk = new ZkemSDK();
+    @Autowired
+    RecordMapperExt recordMapperExt;
     String userId = "1";
     String name = "呆呆";
     String password = "";
@@ -224,16 +229,37 @@ public class ZKController {
     
     @ApiOperation(value = "查询进出记录")
     @RequestMapping(value = "/listRecord", method = RequestMethod.GET)
-    public Map<String, Object> listRecord(@RequestParam(required = false) String userId,
-            @RequestParam(required = false) String time) {
-        String rex = "{name:\"%s\",status:\"%s\",time:\"%s\"}";
-        String data = "[";
-        for (int i = 0; i < 10; i++) {
-            String record = String.format(rex, "张三", "进门", "2018-1-15 8:05");
-            data = data + record + ",";
+    public Map<String, Object> listRecord(@RequestParam(required = false) String name,
+            @RequestParam(required = false) Long startTime,
+            @RequestParam(required = false) Long endTime,
+            @RequestParam Integer page,
+            @RequestParam Integer pageSize
+            ) {
+        Map<String, Object> mapIn = new HashMap<String,Object>();
+        mapIn.put("name", name);
+        mapIn.put("start", new Date(startTime));
+        mapIn.put("end", new Date(endTime));
+        List<Record> list = recordMapperExt.selectBySelective(mapIn);
+        
+        Map<String, Object> mapOut = new HashMap<String, Object>();
+        mapOut.put("notes", list.size());
+        mapOut.put("pageSize", pageSize);
+        double totalPage = Math.ceil((list.size()*1.0)/pageSize);
+        mapOut.put("totalPage", totalPage);
+        if(page>totalPage){
+            page = (int)totalPage;
         }
-        data = data.substring(0, data.length() - 1) + "]";
-        System.out.println(data);
-        return JsonResult.RetJsone(ResultCode.SUCCESS, "", data);
+        mapOut.put("page", page);
+        int start = (page-1)*pageSize;
+        int end = page * pageSize -1;
+        List<Record> list2 = new ArrayList<Record>();
+        for(int i=0;i<list.size();i++){
+            if(i<start || i >end){
+                continue ;
+            }
+            list2.add(list.get(i));
+        }
+        mapOut.put("list", list2);
+        return JsonResult.RetJsone(ResultCode.SUCCESS, "", mapOut);
     }
 }
