@@ -209,4 +209,23 @@ public class ZKController {
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", "");
     }
     
+    @ApiOperation(value = "批量激活用户")
+    @RequestMapping(value = "/batchEnable",method = RequestMethod.PUT)
+    public Map<String, Object> batchEnable(@RequestParam String[] userIds){
+        System.out.println(userIds.length);
+        for(String id : userIds){
+            System.out.println(id);
+        }
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", ""); 
+    }
+    
+    @ApiOperation(value = "批量禁用用户")
+    @RequestMapping(value = "/batchDisable",method = RequestMethod.PUT)
+    public Map<String, Object>  disableEnable(@RequestParam String[] userIds){
+        System.out.println(userIds.length);
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", ""); 
+    }
+    
+    
+    
 }
