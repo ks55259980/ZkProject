@@ -236,15 +236,18 @@ public class ZKController {
             @RequestParam Integer pageSize
             ) {
         Map<String, Object> mapIn = new HashMap<String,Object>();
+        
         mapIn.put("name", name);
-        mapIn.put("start", new Date(startTime));
-        mapIn.put("end", new Date(endTime));
-        List<Record> list = recordMapperExt.selectBySelective(mapIn);
+        if(startTime != null && endTime != null){
+            mapIn.put("startTime", new Date(startTime));
+            mapIn.put("endTime", new Date(endTime));
+        }
+        int notes = recordMapperExt.countBySelective(mapIn);
         
         Map<String, Object> mapOut = new HashMap<String, Object>();
-        mapOut.put("notes", list.size());
+        mapOut.put("notes", notes);
         mapOut.put("pageSize", pageSize);
-        double totalPage = Math.ceil((list.size()*1.0)/pageSize);
+        double totalPage = Math.ceil((notes*1.0)/pageSize);
         mapOut.put("totalPage", totalPage);
         if(page>totalPage){
             page = (int)totalPage;
@@ -252,14 +255,11 @@ public class ZKController {
         mapOut.put("page", page);
         int start = (page-1)*pageSize;
         int end = page * pageSize -1;
-        List<Record> list2 = new ArrayList<Record>();
-        for(int i=0;i<list.size();i++){
-            if(i<start || i >end){
-                continue ;
-            }
-            list2.add(list.get(i));
-        }
-        mapOut.put("list", list2);
+        
+        mapIn.put("start", start);
+        mapIn.put("offset", pageSize);
+        List<Record> list = recordMapperExt.selectBySelective(mapIn);
+        mapOut.put("list", list);
         return JsonResult.RetJsone(ResultCode.SUCCESS, "", mapOut);
     }
 }

@@ -10,4 +10,6 @@ public interface RecordMapperExt {
     
     List<Record> selectBySelective(Map<String, Object> map);
     
+    int countBySelective(Map<String, Object> map);
+    
 }

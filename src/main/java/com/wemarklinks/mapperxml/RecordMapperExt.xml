@@ -12,12 +12,28 @@
     from record 
     <where>
         <if test="name != null">
-            name like '%#{name,jdbcType=VARCHAR}%'
+            name like '%${name}%'
         </if>
-        <if test="time != null">
-            and time between #{start,jdbcType=TIMESTAMP} and #{end,jdbcType=TIMESTAMP}
+        <if test="startTime != null">
+            <if test="endTime != null">
+            and time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+    </where>
+    limit #{start,jdbcType=INTEGER},#{offset,jdbcType=INTEGER}
+  </select>
+  <select id="countBySelective" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*) from record
+        <where>
+        <if test="name != null">
+            name like '%${name}%'
+        </if>
+        <if test="startTime != null">
+            <if test="endTime != null">
+            and time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+            </if>
         </if>
     </where>
   </select>
-
+    
 </mapper>

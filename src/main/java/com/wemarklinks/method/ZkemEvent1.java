@@ -1,6 +1,19 @@
 package com.wemarklinks.method;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.jacob.com.Variant;
+import com.wemarklinks.mapper.RecordMapperExt;
+import com.wemarklinks.pojo.Record;
+import com.wemarklinks.service.ZkService;
 
 /**
  * 中控事件处理类
@@ -8,7 +21,17 @@ import com.jacob.com.Variant;
  * @author 陈捷
  *
  */
+@Component
 public class ZkemEvent1 extends ZkemEvent {
+    
+    private static final Logger log = LoggerFactory.getLogger(ZkemEvent1.class);
+
+    public static final String status = "进门";
+    
+    @Autowired
+    ZkService service;
+    @Autowired
+    RecordMapperExt recordMapperExts;
     
     /**
      * 当验证通过时触发该事件 以下参数全为返回值 函数原型:OnAttTransactionEx(BSTR ErollNumber,LONG
@@ -41,14 +64,32 @@ public class ZkemEvent1 extends ZkemEvent {
         String day = vars[6].toString();
         String hour = vars[7].toString();
         String minute = vars[8].toString();
-//        String seconde = check(vars[9].toString());
+        String second = check(vars[9].toString());
         if (!super.checkLong(userId)) {
             return;
         }
-        String time = String.format("%s-%s-%s %s:%s", year, month, day,hour,minute);
-        System.out.println(time);
-        
-        
+        String time = String.format("%s-%s-%s %s:%s:%s", year, month, day,hour,minute,second);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(time);
+            System.out.println(date);
+            System.out.println("userId:"+userId);
+            Map<String, Object> userInfo = service.SSR_GetUserInfo(userId);
+            if(userInfo == null){
+                log.info("查询用户失败 , 事件触发失败");
+            }
+            Record record = new Record();
+            record.setUserid(userId);
+            record.setName((String)userInfo.get("name"));
+            record.setStatus(status);
+            record.setTime(date);
+            int insert = recordMapperExts.insert(record);
+            if(insert != 1){
+                log.info("插入重复或者失败");
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
     
     private String check(String in){
