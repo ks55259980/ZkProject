@@ -144,7 +144,7 @@ public class ZKTest {
     }
     @Test
     public void getUserInfo(){
-        Map<String, Object> ssr_GetUserInfo = sdk.SSR_GetUserInfo(1, "3");
+        Map<String, Object> ssr_GetUserInfo = sdk.SSR_GetUserInfo(1, "9");
         log.info("读取用户: {}",ssr_GetUserInfo);
     }
     

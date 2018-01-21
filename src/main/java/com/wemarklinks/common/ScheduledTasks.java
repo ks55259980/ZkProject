@@ -21,7 +21,7 @@ public class ScheduledTasks {
         log.info("ScheduledTasks 连接设备 : {}", b);
     }
     
-    @Scheduled(cron = "0 0/8 * * * ?")
+    @Scheduled(cron = "0 0/3 * * * ?")
     public void cheakSDK() {
         boolean b = sdk.ReadRTLog(1);
         log.info("读取实时事件 : {}",b);

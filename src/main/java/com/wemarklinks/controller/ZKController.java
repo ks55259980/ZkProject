@@ -154,49 +154,21 @@ public class ZKController {
     @ApiOperation(value = "激活用户", notes = "激活后 , 该用户可以扫脸并打开门禁")
     @RequestMapping(value = "/enableUser", method = RequestMethod.PUT)
     public Map<String, Object> enableUser(String userId){
-        Map<String,Object> info = service.SSR_GetUserInfo(userId);
-        if(info == null){
-            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
-        }
-        info.put("enabled", true);
-        boolean b = service.changeUserInfo(
-                (String)info.get("userId"), 
-                (String)info.get("name"), 
-                (int)(Integer)info.get("privilege"), 
-                (String)info.get("password"),
-                true);
-        if(b == false){
-            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
-        }
-        boolean ex = service.setUserInfoEx(userId, ZkemSDK.FACE);
-        if(ex == false){
+        Map<String, Object> map = enableOrDisable(userId, true);
+        if(map == null){
             return JsonResult.RetJsone(ResultCode.SYS_ERROR , "激活用户失败", "");
         }
-        return JsonResult.RetJsone(ResultCode.SUCCESS , "", info);
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", map);
     }
     
     @ApiOperation(value = "禁用用户", notes = "禁用后 , 该用户无法打开门禁")
     @RequestMapping(value = "/disableUser", method = RequestMethod.PUT)
     public Map<String, Object> disableUser(String userId){
-        Map<String,Object> info = service.SSR_GetUserInfo(userId);
-        if(info == null){
+        Map<String, Object> map = enableOrDisable(userId, false);
+        if(map == null){
             return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
         }
-        info.put("enabled", false);
-        boolean b = service.changeUserInfo(
-                (String)info.get("userId"), 
-                (String)info.get("name"), 
-                (int)(Integer)info.get("privilege"), 
-                (String)info.get("password"),
-                false);
-        if(b == false){
-            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
-        }
-        boolean ex = service.setUserInfoEx(userId, ZkemSDK.PW);
-        if(ex == false){
-            return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
-        }
-        return JsonResult.RetJsone(ResultCode.SUCCESS , "", info);
+        return JsonResult.RetJsone(ResultCode.SUCCESS , "", map);
     }
     
     @ApiOperation(value = "删除用户", notes = "删除用户")
@@ -212,9 +184,12 @@ public class ZKController {
     @ApiOperation(value = "批量激活用户")
     @RequestMapping(value = "/batchEnable",method = RequestMethod.PUT)
     public Map<String, Object> batchEnable(@RequestParam String[] userIds){
-        System.out.println(userIds.length);
-        for(String id : userIds){
-            System.out.println(id);
+        for(String userId : userIds){
+            Map<String, Object> map = enableOrDisable(userId, true);
+            if(map == null){
+                log.info("激活用户失败,{}",userId);
+                return JsonResult.RetJsone(ResultCode.SYS_ERROR , "激活用户失败", "");
+            }
         }
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", ""); 
     }
@@ -222,10 +197,41 @@ public class ZKController {
     @ApiOperation(value = "批量禁用用户")
     @RequestMapping(value = "/batchDisable",method = RequestMethod.PUT)
     public Map<String, Object>  disableEnable(@RequestParam String[] userIds){
-        System.out.println(userIds.length);
+        for(String userId : userIds){
+            Map<String, Object> map = enableOrDisable(userId, false);
+            if(map == null){
+                log.info("禁用用户失败:{}",userId);
+                return JsonResult.RetJsone(ResultCode.SYS_ERROR , "禁用用户失败", "");
+            }
+        }
         return JsonResult.RetJsone(ResultCode.SUCCESS , "", ""); 
     }
     
-    
+    private Map<String, Object> enableOrDisable(String userId, boolean able){
+        Map<String,Object> info = service.SSR_GetUserInfo(userId);
+        if(info == null){
+            return null;
+        }
+        info.put("enabled", able);
+        boolean b = service.changeUserInfo(
+                (String)info.get("userId"), 
+                (String)info.get("name"), 
+                (int)(Integer)info.get("privilege"), 
+                (String)info.get("password"),
+                able);
+        if(b == false){
+            return null;
+        }
+        boolean ex = false;
+        if(able == true){
+            ex = service.setUserInfoEx(userId, ZkemSDK.FACE);
+        }else{
+            ex = service.setUserInfoEx(userId, ZkemSDK.PW);
+        }
+        if(ex == false){
+            return null;
+        }
+        return info;
+    }
     
 }
