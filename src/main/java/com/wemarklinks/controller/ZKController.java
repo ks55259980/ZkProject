@@ -264,7 +264,7 @@ public class ZKController {
             mapOut.put("list", list);
         }catch(Exception e){
             mapOut.put("list", "");
-            e.printStackTrace();
+            log.warn("BadSqlGrammarException : {}" , "result is null");
         }
         return JsonResult.RetJsone(ResultCode.SUCCESS, "", mapOut);
     }
