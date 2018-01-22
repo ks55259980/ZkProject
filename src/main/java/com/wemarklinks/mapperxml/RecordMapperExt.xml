@@ -8,6 +8,8 @@
       #{name,jdbcType=VARCHAR})
   </insert>
   <select id="selectBySelective" parameterType="java.util.Map" resultType="com.wemarklinks.pojo.Record">
+    select  userId,name,status,time 
+    from (
     select userId,name,status,time 
     from record 
     <where>
@@ -16,11 +18,16 @@
         </if>
         <if test="startTime != null">
             <if test="endTime != null">
-            and time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+          and time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP} 
             </if>
         </if>
     </where>
-    limit #{start,jdbcType=INTEGER},#{offset,jdbcType=INTEGER}
+      <![CDATA[
+            ORDER BY time ASC
+        ]]>) a
+       <![CDATA[
+                LIMIT #{start},#{offset}
+            ]]>
   </select>
   <select id="countBySelective" parameterType="java.util.Map" resultType="java.lang.Integer">
     select count(*) from record

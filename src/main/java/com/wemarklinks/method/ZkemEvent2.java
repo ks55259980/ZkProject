@@ -1,6 +1,18 @@
 package com.wemarklinks.method;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jacob.com.Variant;
+import com.wemarklinks.dao.RecordDao;
+import com.wemarklinks.pojo.Record;
+import com.wemarklinks.service.ZkService;
 
 /**
  * 中控事件处理类
@@ -9,7 +21,11 @@ import com.jacob.com.Variant;
  *
  */
 public class ZkemEvent2 extends ZkemEvent {
+    private static final Logger log = LoggerFactory.getLogger(ZkemEvent1.class);
+
+    public static final String status = "出门";
     
+    RecordDao dao = new RecordDao();
     /**
      * 当验证通过时触发该事件 以下参数全为返回值 函数原型:OnAttTransactionEx(BSTR ErollNumber,LONG
      * IsInValid,LONG AttState,LONG VerifyMethod, LONG Year,LONG Month,LONG
@@ -26,9 +42,43 @@ public class ZkemEvent2 extends ZkemEvent {
     public void OnAttTransactionEx(Variant[] vars) {
         System.out.println("Event : OnAttTransactionEx222--->" + Thread.currentThread().getName());
         String userId = vars[0].toString();
-        if (!super.checkLong(userId)) {
-            return;
-        }
-        System.out.println(userId);
+//      int isInValid = vars[1].getInt();
+//      int attState = vars[2].getInt();
+//      int verifyMethod = vars[3].getInt();
+      String year = vars[4].toString();
+//      String month = check(vars[5].toString());
+//      String day = check(vars[6].toString());
+//      String hour = check(vars[7].toString());
+//      String minute = check(vars[8].toString());
+//      String second = check(vars[9].toString());
+      String month = vars[5].toString();
+      String day = vars[6].toString();
+      String hour = vars[7].toString();
+      String minute = vars[8].toString();
+      String second = vars[9].toString();
+      if (!super.checkLong(userId)) {
+          return;
+      }
+      String time = String.format("%s-%s-%s %s:%s:%s", year, month, day,hour,minute,second);
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      try {
+          Date date = sdf.parse(time);
+          ZkemSDK sdk = ZkService.getSDK();
+          Map<String, Object> userInfo = sdk.SSR_GetUserInfo(ZkemSDK.machineNumber, userId);
+          if(userInfo == null){
+              log.info("查询用户失败 , 事件触发失败");
+          }
+          Record record = new Record();
+          record.setUserId(userId);
+          record.setName((String)userInfo.get("name"));
+          record.setStatus(status);
+          record.setTime(new Timestamp(date.getTime()));
+          boolean b = dao.saveRecord(record);
+          if(b == false){
+              log.info("插入重复或者失败");
+          }
+      } catch (ParseException e) {
+          e.printStackTrace();
+      }
     }
 }

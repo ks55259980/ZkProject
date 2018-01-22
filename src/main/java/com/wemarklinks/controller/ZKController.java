@@ -1,7 +1,6 @@
 package com.wemarklinks.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -219,7 +219,7 @@ public class ZKController {
         if (able == true) {
             ex = service.setUserInfoEx(userId, ZkemSDK.FACE);
         } else {
-            ex = service.setUserInfoEx(userId, ZkemSDK.PW);
+            ex = service.setUserInfoEx(userId, ZkemSDK.FP);
         }
         if (ex == false) {
             return null;
@@ -235,16 +235,17 @@ public class ZKController {
             @RequestParam Integer page,
             @RequestParam Integer pageSize
             ) {
+        System.out.println(startTime);
+        System.out.println(endTime);
         Map<String, Object> mapIn = new HashMap<String,Object>();
-        
-        mapIn.put("name", name);
+        mapIn.put("name", StringUtils.isEmpty(name)?null:name);
         if(startTime != null && endTime != null){
-            mapIn.put("startTime", new Date(startTime));
-            mapIn.put("endTime", new Date(endTime));
+            mapIn.put("startTime", new Timestamp(startTime));
+            mapIn.put("endTime", new Timestamp(endTime));
         }
         int notes = recordMapperExt.countBySelective(mapIn);
-        
         Map<String, Object> mapOut = new HashMap<String, Object>();
+        log.info("notes:{}",notes);
         mapOut.put("notes", notes);
         mapOut.put("pageSize", pageSize);
         double totalPage = Math.ceil((notes*1.0)/pageSize);
@@ -258,8 +259,13 @@ public class ZKController {
         
         mapIn.put("start", start);
         mapIn.put("offset", pageSize);
-        List<Record> list = recordMapperExt.selectBySelective(mapIn);
-        mapOut.put("list", list);
+        try{
+            List<Record> list = recordMapperExt.selectBySelective(mapIn);
+            mapOut.put("list", list);
+        }catch(Exception e){
+            mapOut.put("list", "");
+            e.printStackTrace();
+        }
         return JsonResult.RetJsone(ResultCode.SUCCESS, "", mapOut);
     }
 }

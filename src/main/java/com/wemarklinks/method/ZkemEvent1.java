@@ -1,5 +1,6 @@
 package com.wemarklinks.method;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,9 +9,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.jacob.com.Variant;
+import com.wemarklinks.dao.RecordDao;
 import com.wemarklinks.mapper.RecordMapperExt;
 import com.wemarklinks.pojo.Record;
 import com.wemarklinks.service.ZkService;
@@ -21,17 +23,14 @@ import com.wemarklinks.service.ZkService;
  * @author 陈捷
  *
  */
-@Component
+@Service
 public class ZkemEvent1 extends ZkemEvent {
     
     private static final Logger log = LoggerFactory.getLogger(ZkemEvent1.class);
 
     public static final String status = "进门";
     
-    @Autowired
-    ZkService service;
-    @Autowired
-    RecordMapperExt recordMapperExts;
+    RecordDao dao = new RecordDao();
     
     /**
      * 当验证通过时触发该事件 以下参数全为返回值 函数原型:OnAttTransactionEx(BSTR ErollNumber,LONG
@@ -48,13 +47,10 @@ public class ZkemEvent1 extends ZkemEvent {
      */
     public void OnAttTransactionEx(Variant[] vars) {
         System.out.println("Event : OnAttTransactionEx111--->" + Thread.currentThread().getName());
-        for(Variant var : vars){
-            System.out.println(var);
-        }
         String userId = vars[0].toString();
-        int isInValid = vars[1].getInt();
-        int attState = vars[2].getInt();
-        int verifyMethod = vars[3].getInt();
+//        int isInValid = vars[1].getInt();
+//        int attState = vars[2].getInt();
+//        int verifyMethod = vars[3].getInt();
         String year = vars[4].toString();
 //        String month = check(vars[5].toString());
 //        String day = check(vars[6].toString());
@@ -72,19 +68,18 @@ public class ZkemEvent1 extends ZkemEvent {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date date = sdf.parse(time);
-            System.out.println(date);
-            System.out.println("userId:"+userId);
-            Map<String, Object> userInfo = service.SSR_GetUserInfo(userId);
+            ZkemSDK sdk = ZkService.getSDK();
+            Map<String, Object> userInfo = sdk.SSR_GetUserInfo(ZkemSDK.machineNumber, userId);
             if(userInfo == null){
                 log.info("查询用户失败 , 事件触发失败");
             }
             Record record = new Record();
-            record.setUserid(userId);
+            record.setUserId(userId);
             record.setName((String)userInfo.get("name"));
             record.setStatus(status);
-            record.setTime(date);
-            int insert = recordMapperExts.insert(record);
-            if(insert != 1){
+            record.setTime(new Timestamp(date.getTime()));
+            boolean b = dao.saveRecord(record);
+            if(b == false){
                 log.info("插入重复或者失败");
             }
         } catch (ParseException e) {

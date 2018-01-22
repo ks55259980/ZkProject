@@ -19,15 +19,19 @@ import com.wemarklinks.method.ZkemSDK;
 public class ZkService {
     
     private static final Logger log = LoggerFactory.getLogger(ZkService.class);
-    private ZkemSDK sdk = new ZkemSDK();
+    private static ZkemSDK sdk = new ZkemSDK();
     ZKConfig config = new ZKConfig();
-    
+  
     public ZkService() {
         log.info("init ZkService");
         boolean b1 = sdk.Connect_Net(config.getIp()[0], config.getPort());
         if (b1 == false) {
             log.warn("连接考勤机失败");
         }
+    }
+    
+    public static ZkemSDK getSDK(){
+        return sdk;
     }
     
     // private boolean connectNet(int i) {
